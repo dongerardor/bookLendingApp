@@ -25,7 +25,6 @@ class BookThumb extends React.Component {
 					}}/>
 
 					<div className="book-shelf-changer">
-						
 						<select 
 						 	value={this.state.shelf}
 							onChange = {((event) => this.props.onChangeShelf(this.props.book, event.target.value))} >
@@ -37,15 +36,15 @@ class BookThumb extends React.Component {
 							<option value="none">None</option>	
 				  		</select>
 					</div>
-					
-					<div className="book-title">
-						{this.props.book.title}
-					</div>
-				
-					<div className="book-authors">
-						{this.props.book.authors.join(', ')}
-					</div>			
 				</div>
+					
+				<div className="book-title">
+					{this.props.book.title}
+				</div>
+			
+				<div className="book-authors">
+					{this.props.book.authors.join(', ')}
+				</div>			
 			</div>
 		)
 	}

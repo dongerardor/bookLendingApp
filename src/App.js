@@ -45,7 +45,6 @@ class BooksApp extends React.Component {
 		this.setState({ query: '' })
 	}
 
-
   	render() {
 
 		return (
@@ -157,7 +156,6 @@ class BooksApp extends React.Component {
 						)
 					}
 				/>
-			
 			</div>
 		)
 	}
