@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import * as BooksAPI from './BooksAPI';
 import './App.css';
 import BookList from './BookList';
@@ -7,13 +6,12 @@ import { Link } from 'react-router-dom';
 import { Route } from 'react-router-dom';
 
 
-
-
 class BooksApp extends React.Component {
 
 	state = {
 		query: '',
-		books: []
+		books: [],
+		queryBooks: []
 	}
 
 	componentDidMount() {
@@ -25,28 +23,43 @@ class BooksApp extends React.Component {
 	}
 
 	onChangeShelf(updatedBook, shelf){
-		const updatedBooks = this.state.books.map(function(book){
-			if (book.id === updatedBook.id){
-				book.shelf = shelf;
-			}
-			return book;
-		});
+		
+		BooksAPI.update(updatedBook, shelf).then(() => {
+			
+			BooksAPI.getAll().then((books) => {
+				this.setState( {
+					books
+				})
+			})
 
-		this.setState( {
-			'books': updatedBooks
+			if (!!this.state.query){
+				BooksAPI.search(this.state.query, 10).then((queryBooks) => {
+					this.setState( {
+						queryBooks
+					})
+				}) 
+			}
 		})
 	}
 
 	updateQuery = (query) => {
-		this.setState({ query: query.trim() })
+		
+		this.setState({ query: query });
+
+		if(query.length >= 3){
+			BooksAPI.search(this.state.query, 10).then((queryBooks) => {
+				this.setState({
+					queryBooks
+				})
+			})
+		}
 	}
 
 	clearQuery = () => {
-		this.setState({ query: '' })
+		this.setState({ query: '', queryBooks: [] })
 	}
 
   	render() {
-
 		return (
 			<div className="app">
 				<Route
@@ -56,19 +69,19 @@ class BooksApp extends React.Component {
 							<div className="search-books">
 								<div className="search-books-bar">
 									
-									<Link to='/' className="close-search">
-										Close
+									<Link 
+										to='/'
+										className="close-search"
+										onClick={(event) => this.clearQuery()}>
 									</Link>
 									
 									<div className="search-books-input-wrapper">
-									
 										<input
 											type='text'
 											placeholder='Search by title or author'
 											value={this.state.query}
 											onChange={(event) => this.updateQuery(event.target.value)}
 										/>
-
 									</div>
 								</div>
 						
@@ -77,9 +90,9 @@ class BooksApp extends React.Component {
 
 									<BookList
 										books={this.state.books}
-										shelf='searching'
 										changeShelf={this.onChangeShelf.bind(this)}
 										query={this.state.query}
+										queryBooks={this.state.queryBooks}
 									/>
 								</div>
 							</div>
@@ -134,23 +147,22 @@ class BooksApp extends React.Component {
 										<div className="bookshelf">
 											<h2 className="bookshelf-title">Read</h2>
 											<div className="bookshelf-books">
-										
 												<BookList
 													books={this.state.books}
 													shelf='read'
 													changeShelf={this.onChangeShelf.bind(this)}
 												/>
-
 											</div>
 										</div>
 									</div>
 								</div>
 
 								<div className="open-search">
-									<Link to='/search'>
+									<Link
+										to='/search'
+										onClick={(event) => this.clearQuery()}>
 										Add a book
 									</Link>
-									
 								</div>
 							</div>
 						)
