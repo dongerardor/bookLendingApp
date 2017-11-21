@@ -2,54 +2,62 @@ import React from 'react';
 import './App.css'
 import BookThumb from './BookThumb'
 import escapeRegExp from 'escape-string-regexp'
+import PropTypes from 'prop-types'
 
-class BookList extends React.Component {
+/**
+* @function BookList
+* @description List book component
+* @param {props} queryBooks (Array), books (Array), shelf (String)
+* @return jsx expression
+*/
+function BookList (props) {
+	
+	let booksToShow;
 
+	if(props.queryBooks && props.queryBooks.length) {
+		
+		booksToShow = props.queryBooks.map(function (queryBook){
 
+			const bookInShelf = props.books.filter((book) => book.id === queryBook.id);
 
-	render() {
+			if (!!bookInShelf.length){
+				queryBook = bookInShelf[0]
+			}
 
-		let booksToShow;
+			return queryBook;
 
-		if(this.props.queryBooks && this.props.queryBooks.length) {
-			
-			booksToShow = this.props.queryBooks.map(function (queryBook){
+		}, this);
 
-				const bookInShelf = this.props.books.filter((book) => book.id === queryBook.id);
+	} else if (props.books && props.books.length) {
+		
+		booksToShow = props.books.filter((book) => book.shelf === props.shelf);
+		
+	} else {
 
-				if (!!bookInShelf.length){
-					queryBook = bookInShelf[0]
-				}
+		return (<p>Loading...</p>);
 
-				return queryBook;
-
-			}, this);
-
-		} else if (this.props.books && this.props.books.length) {
-			
-			booksToShow = this.props.books.filter((book) => book.shelf === this.props.shelf);
-			
-		} else {
-
-			return (<p>Loading...</p>);
-
-		}
-
-		return (
-
-			<ol className="books-grid">
-			{
-
-				booksToShow.map((book) => 
-					<li key={book.id}>
-						<BookThumb 
-							book={book}
-							onChangeShelf={this.props.changeShelf}/>
-					</li>
-			)}
-			</ol>
-		)
 	}
+
+	return (
+
+		<ol className="books-grid">
+		{
+
+			booksToShow.map((book) => 
+				<li key={book.id}>
+					<BookThumb 
+						book={book}
+						onChangeShelf={props.changeShelf}/>
+				</li>
+		)}
+		</ol>
+	)
+}
+
+BookList.PropTypes = {
+	queryBooks: PropTypes.array,
+	books: PropTypes.array,
+	shelf: PropTypes.string
 }
 
 module.exports = BookList
